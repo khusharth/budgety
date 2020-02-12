@@ -112,7 +112,8 @@ var UIController = ( function() {
         budgetLabel: '.budget__value',
         incomeLabel: '.budget__income--value',
         expenseLabel: '.budget__expenses--value',
-        percentageLabel: '.budget__expenses--percentage'
+        percentageLabel: '.budget__expenses--percentage',
+        container: '.container'
     };
 
     return {
@@ -200,6 +201,8 @@ var controller = (function(budgetCtrl, UICtrl) {
                 ctrlAddItem();
             }
         });
+        // Event Delegation -> setting event listner on parent
+        document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem)
    };
 
     var updateBudget = function() {
@@ -232,9 +235,29 @@ var controller = (function(budgetCtrl, UICtrl) {
             // 5. Calculate the budget and update budget
             updateBudget();
         }
-        
-
    }
+
+   var ctrlDeleteItem = function(event) {
+        // By looking at the target propert of event we can find where the event was fired
+        var itemID, splitID, type, ID;
+        itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
+        // only work if ID is present
+        if (itemID) {
+            //inc-1
+            splitID = itemID.split('-');
+            type = splitID[0];
+            ID = splitID[1];
+
+            // 1. Delete item from our Data structure
+
+
+            //2. Delete item from UI
+
+            
+            //3. Update and show the new budget
+        }
+
+   };
 
 // To make a public function return it
    return {
