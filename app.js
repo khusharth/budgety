@@ -158,7 +158,8 @@ var UIController = ( function() {
         expenseLabel: '.budget__expenses--value',
         percentageLabel: '.budget__expenses--percentage',
         container: '.container',
-        expensePercLabel: '.item__percentage'
+        expensePercLabel: '.item__percentage',
+        dateLabel: '.budget__title--month'
     };
 
     var formatNumber = function(num, type) {
@@ -179,7 +180,15 @@ var UIController = ( function() {
 
         // () will return + or -
         return (type === 'exp' ? '-' : '+') + ' ' + int + '.' + dec;
-    }
+    };
+
+    // To use forEach on a nodelist -> create our own forEach function for nodeList
+    var nodeListForEach = function(list, callback) {
+        for (var i = 0; i < list.length; i++) {
+            // First class function | list[i] = current and i = index
+            callback(list[i], i);
+        }
+    };
 
     return {
         // Public Method
@@ -254,14 +263,6 @@ var UIController = ( function() {
             
             // returns a list -> a nodeList (each element in domis called a Node)
             var fields = document.querySelectorAll(DOMstrings.expensePercLabel); 
-        
-            // To use forEach on a nodelist -> create our own forEach function for nodeList
-            var nodeListForEach = function(list, callback) {
-                for (var i = 0; i < list.length; i++) {
-                    // First class function | list[i] = current and i = index
-                    callback(list[i], i);
-                }
-            };
 
             nodeListForEach(fields, function(current, index){
                 if (percentages[index] > 0 ) {
@@ -273,6 +274,32 @@ var UIController = ( function() {
             });
 
 
+        },
+
+        displayMonth: function() {
+            var now, month, months, year;
+            
+            now = new Date(); // current date
+
+            months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            month = now.getMonth(); // current Month -> gives number
+
+            year = now.getFullYear(); // current year
+            document.querySelector(DOMstrings.dateLabel).textContent = months[month] + ' ' + year;
+        },
+
+        changedType: function() { 
+            
+            var fields = document.querySelectorAll(
+                DOMstrings.inputType + ',' +
+                DOMstrings.inputDescription + ',' +
+                DOMstrings.inputValue);
+
+            nodeListForEach(fields, function(cur){
+              cur.classList.toggle('red-focus');
+            });
+
+            document.querySelector(DOMstrings.inputBtn).classList.toggle('red');
         },
 
         // Making DOM strings public for other modules
@@ -302,7 +329,9 @@ var controller = (function(budgetCtrl, UICtrl) {
             }
         });
         // Event Delegation -> setting event listner on parent
-        document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem)
+        document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem);
+
+        document.querySelector(DOM.inputType).addEventListener('change', UICtrl.changedType);
    };
 
     var updateBudget = function() {
@@ -386,6 +415,7 @@ var controller = (function(budgetCtrl, UICtrl) {
    return {
         init: function() {
             console.log('Application is started...');
+            UICtrl.displayMonth();
 
             UICtrl.displayBudget({
                 budget: 0,
